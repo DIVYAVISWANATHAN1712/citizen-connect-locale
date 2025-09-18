@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIssues } from "@/hooks/useIssues";
+import { RealTimeStats } from "@/components/RealTimeStats";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { MapPin, Users, Clock, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
@@ -54,6 +56,7 @@ const mockIssues = [
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
+  const { issues, updateIssueStatus } = useIssues();
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
@@ -79,72 +82,8 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("totalIssues", language)}
-                  </CardTitle>
-                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.totalIssues}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +12% from last month
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("pendingIssues", language)}
-                  </CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-warning">
-                    {mockStats.pendingIssues}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Requires attention
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("resolvedIssues", language)}
-                  </CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-success">
-                    {mockStats.resolvedIssues}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    62.8% resolution rate
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("averageResolutionTime", language)}
-                  </CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{mockStats.averageResolutionTime}</div>
-                  <p className="text-xs text-muted-foreground">
-                    -0.5 days vs last month
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Real-time Stats */}
+            <RealTimeStats language={language} />
 
             {/* Recent Issues */}
             <Card>

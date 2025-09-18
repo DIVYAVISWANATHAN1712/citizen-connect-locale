@@ -2,13 +2,27 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, FileText, Settings, Users } from "lucide-react";
+import { MapPin, FileText, Settings, Users, LogOut, User } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const handleAuthAction = () => {
+    if (user) {
+      navigate("/my-reports");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-accent/5">
@@ -20,8 +34,20 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">
               {language === "hi" ? "नागरिक सेवा मंच" : "Civic Service Platform"}
             </p>
+            {user && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {language === "hi" ? "स्वागत है" : "Welcome"}, {user.email}
+              </p>
+            )}
           </div>
-          <LanguageToggle />
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            {user && (
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -70,21 +96,33 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* My Reports */}
+          {/* My Reports / Login */}
           <Card>
             <CardContent className="p-4">
               <Button
-                onClick={() => navigate("/my-reports")}
+                onClick={handleAuthAction}
                 variant="ghost"
                 className="w-full justify-start gap-4 h-16"
               >
                 <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-secondary-foreground" />
+                  {user ? (
+                    <FileText className="h-5 w-5 text-secondary-foreground" />
+                  ) : (
+                    <User className="h-5 w-5 text-secondary-foreground" />
+                  )}
                 </div>
                 <div className="text-left">
-                  <div className="font-medium">{t("myReports", language)}</div>
+                  <div className="font-medium">
+                    {user 
+                      ? t("myReports", language)
+                      : (language === "hi" ? "लॉगिन करें" : "Sign In")
+                    }
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    {language === "hi" ? "अपनी रिपोर्ट्स देखें" : "View your submitted reports"}
+                    {user 
+                      ? (language === "hi" ? "अपनी रिपोर्ट्स देखें" : "View your submitted reports")
+                      : (language === "hi" ? "खाता बनाएं या लॉगिन करें" : "Create account or sign in")
+                    }
                   </div>
                 </div>
               </Button>
