@@ -1,31 +1,36 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User as SupabaseUser } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
-  user: SupabaseUser | null;
+  user: User | null;
+  session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, phone?: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, phone?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  updateProfile: (phone: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -35,18 +40,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    return { error };
   };
 
   const signUp = async (email: string, password: string, phone?: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
     const { error } = await supabase.auth.signUp({ 
       email, 
       password,
       options: {
+        emailRedirectTo: redirectUrl,
         data: { phone }
       }
     });
-    if (error) throw error;
+    return { error };
   };
 
   const signOut = async () => {
@@ -54,21 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
-  const updateProfile = async (phone: string) => {
-    const { error } = await supabase.auth.updateUser({
-      data: { phone }
-    });
-    if (error) throw error;
-  };
-
   return (
     <AuthContext.Provider value={{
       user,
+      session,
       loading,
       signIn,
       signUp,
       signOut,
-      updateProfile
     }}>
       {children}
     </AuthContext.Provider>

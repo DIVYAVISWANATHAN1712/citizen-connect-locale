@@ -81,13 +81,12 @@ export default function ReportIssue() {
       await createIssue({
         title: formData.title,
         description: formData.description,
-        category: formData.category,
-        location: formData.location,
+        category: formData.category as 'waste' | 'roads' | 'streetlights' | 'water' | 'other',
+        address: formData.location,
         latitude: userLocation?.lat,
         longitude: userLocation?.lng,
         user_email: formData.email,
         user_phone: formData.phone,
-        priority: 'medium', // Default priority
       });
       
       toast({
