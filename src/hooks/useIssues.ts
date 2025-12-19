@@ -73,7 +73,11 @@ export function useIssues() {
     return data;
   };
 
-  const updateIssueStatus = async (id: string, status: Issue['status']) => {
+  const updateIssueStatus = async (id: string, status: Issue['status'], language: 'en' | 'hi' = 'en') => {
+    // Get the current issue to find old status
+    const currentIssue = issues.find(i => i.id === id);
+    const oldStatus = currentIssue?.status;
+
     const updateData: Partial<Issue> = { status };
     if (status === 'resolved') {
       updateData.resolved_at = new Date().toISOString();
@@ -107,6 +111,7 @@ export function useIssues() {
 
       const message = statusMessages[status as keyof typeof statusMessages];
       if (message) {
+        // Create in-app notification
         await supabase.from('notifications').insert([{
           user_id: issue.user_id,
           issue_id: id,
@@ -115,6 +120,28 @@ export function useIssues() {
           message_en: message.en,
           message_hi: message.hi,
         }]);
+
+        // Send email notification via edge function
+        try {
+          const { error: emailError } = await supabase.functions.invoke('send-notification', {
+            body: {
+              issueId: id,
+              userEmail: issue.user_email,
+              issueTitle: issue.title,
+              oldStatus: oldStatus || 'submitted',
+              newStatus: status,
+              language,
+            },
+          });
+
+          if (emailError) {
+            console.error('Failed to send email notification:', emailError);
+          } else {
+            console.log('Email notification sent successfully');
+          }
+        } catch (emailErr) {
+          console.error('Error sending email notification:', emailErr);
+        }
       }
     }
     
