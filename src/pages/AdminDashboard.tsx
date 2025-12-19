@@ -4,60 +4,43 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useIssues } from "@/hooks/useIssues";
+import { useIssues, Issue } from "@/hooks/useIssues";
 import { RealTimeStats } from "@/components/RealTimeStats";
+import { IssueMap } from "@/components/IssueMap";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, Users, Clock, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
-
-const mockStats = {
-  totalIssues: 156,
-  pendingIssues: 42,
-  resolvedIssues: 98,
-  averageResolutionTime: "3.2 days",
-};
-
-const mockIssues = [
-  {
-    id: 1,
-    category: "roads",
-    description: "Large pothole on Main Street causing traffic issues",
-    status: "in_progress" as const,
-    location: "Main Street, Sector 15",
-    priority: "high",
-    assignedTo: "Roads Dept.",
-    reportedBy: "Citizen #1234",
-    date: "2024-01-15",
-  },
-  {
-    id: 2,
-    category: "streetlights",
-    description: "Street light not working for past 3 days",
-    status: "acknowledged" as const,
-    location: "Park Avenue, Sector 12",
-    priority: "medium",
-    assignedTo: "Electrical Dept.",
-    reportedBy: "Citizen #5678",
-    date: "2024-01-14",
-  },
-  {
-    id: 3,
-    category: "waste",
-    description: "Garbage overflow near community center",
-    status: "submitted" as const,
-    location: "Community Center, Sector 8",
-    priority: "high",
-    assignedTo: "Unassigned",
-    reportedBy: "Citizen #9012",
-    date: "2024-01-13",
-  },
-];
+import { MapPin, Users, Calendar, RefreshCw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
-  const { issues, updateIssueStatus } = useIssues();
+  const { issues, loading, updateIssueStatus, refetch } = useIssues();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+  const handleStatusUpdate = async (issueId: string, newStatus: Issue['status']) => {
+    try {
+      await updateIssueStatus(issueId, newStatus);
+      toast({
+        title: language === 'hi' ? 'स्थिति अपडेट की गई' : 'Status Updated',
+        description: language === 'hi' ? 'समस्या की स्थिति सफलतापूर्वक अपडेट की गई' : 'Issue status has been updated successfully',
+      });
+    } catch (error) {
+      toast({
+        title: t("error", language),
+        description: 'Failed to update status',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleIssueClick = (issue: Issue) => {
+    setSelectedIssue(issue);
+    setActiveTab("issues");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,9 +49,15 @@ export default function AdminDashboard() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-primary">
-              {t("dashboard", language)} - Staff Portal
+              {t("dashboard", language)} - {language === 'hi' ? 'स्टाफ पोर्टल' : 'Staff Portal'}
             </h1>
-            <LanguageToggle />
+            <div className="flex items-center gap-4">
+              <Button variant="outline" size="sm" onClick={refetch} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                {language === 'hi' ? 'रीफ्रेश' : 'Refresh'}
+              </Button>
+              <LanguageToggle />
+            </div>
           </div>
         </div>
       </div>
@@ -76,101 +65,167 @@ export default function AdminDashboard() {
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="issues">Issues</TabsTrigger>
-            <TabsTrigger value="map">Map View</TabsTrigger>
+            <TabsTrigger value="overview">
+              {language === 'hi' ? 'अवलोकन' : 'Overview'}
+            </TabsTrigger>
+            <TabsTrigger value="issues">
+              {language === 'hi' ? 'समस्याएं' : 'Issues'} ({issues.length})
+            </TabsTrigger>
+            <TabsTrigger value="map">
+              {language === 'hi' ? 'मानचित्र' : 'Map View'}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             {/* Real-time Stats */}
             <RealTimeStats language={language} />
 
-            {/* Recent Issues */}
+            {/* Recent Issues from Database */}
             <Card>
-              <CardHeader>
-                <CardTitle>Recent Issues</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>{language === 'hi' ? 'हाल की समस्याएं' : 'Recent Issues'}</CardTitle>
+                <Badge variant="outline">{language === 'hi' ? 'लाइव' : 'Live'}</Badge>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {mockIssues.slice(0, 3).map((issue) => (
-                    <div key={issue.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="space-y-1">
-                        <p className="font-medium">{issue.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {issue.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {issue.assignedTo}
-                          </span>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  </div>
+                ) : issues.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    {language === 'hi' ? 'कोई समस्या नहीं मिली' : 'No issues found'}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {issues.slice(0, 5).map((issue) => (
+                      <div key={issue.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="space-y-1 flex-1">
+                          <p className="font-medium">{issue.title}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-1">{issue.description}</p>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {issue.address || `${issue.latitude?.toFixed(4)}, ${issue.longitude?.toFixed(4)}`}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(issue.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{t(issue.category, language)}</Badge>
+                          <StatusBadge status={issue.status} language={language} />
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={issue.priority === "high" ? "destructive" : "secondary"}>
-                          {issue.priority}
-                        </Badge>
-                        <StatusBadge status={issue.status} language={language} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="issues" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">All Issues</h2>
-              <Button>Filter & Sort</Button>
+              <h2 className="text-xl font-semibold">
+                {language === 'hi' ? 'सभी समस्याएं' : 'All Issues'}
+              </h2>
             </div>
             
-            <div className="space-y-4">
-              {mockIssues.map((issue) => (
-                <Card key={issue.id}>
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="space-y-1">
-                        <h3 className="font-medium">{issue.description}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Reported by {issue.reportedBy} on {issue.date}
-                        </p>
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              </div>
+            ) : issues.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12 text-muted-foreground">
+                  {language === 'hi' ? 'कोई समस्या नहीं मिली' : 'No issues found'}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {issues.map((issue) => (
+                  <Card key={issue.id} className={selectedIssue?.id === issue.id ? 'ring-2 ring-primary' : ''}>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="space-y-1 flex-1">
+                          <h3 className="font-medium">{issue.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {issue.description}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {language === 'hi' ? 'द्वारा रिपोर्ट किया गया' : 'Reported by'} {issue.user_email} • {new Date(issue.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <StatusBadge status={issue.status} language={language} />
                       </div>
-                      <StatusBadge status={issue.status} language={language} />
-                    </div>
-                    
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {issue.location}
-                      </span>
-                      <Badge variant="outline">{t(issue.category as any, language)}</Badge>
-                      <Badge variant={issue.priority === "high" ? "destructive" : "secondary"}>
-                        {issue.priority} priority
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex gap-2 mt-3">
-                      <Button size="sm" variant="outline">Assign</Button>
-                      <Button size="sm" variant="outline">Update Status</Button>
-                      <Button size="sm">View Details</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      
+                      <div className="flex items-center gap-4 text-sm flex-wrap">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {issue.address || `${issue.latitude?.toFixed(4)}, ${issue.longitude?.toFixed(4)}`}
+                        </span>
+                        <Badge variant="outline">{t(issue.category, language)}</Badge>
+                        {issue.upvotes && issue.upvotes > 0 && (
+                          <Badge variant="secondary">{issue.upvotes} {language === 'hi' ? 'वोट' : 'upvotes'}</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex gap-2 mt-4 items-center">
+                        <Select
+                          value={issue.status}
+                          onValueChange={(value) => handleStatusUpdate(issue.id, value as Issue['status'])}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Update Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="submitted">
+                              {language === 'hi' ? 'सबमिट किया गया' : 'Submitted'}
+                            </SelectItem>
+                            <SelectItem value="acknowledged">
+                              {language === 'hi' ? 'स्वीकार किया गया' : 'Acknowledged'}
+                            </SelectItem>
+                            <SelectItem value="in_progress">
+                              {language === 'hi' ? 'प्रगति में' : 'In Progress'}
+                            </SelectItem>
+                            <SelectItem value="resolved">
+                              {language === 'hi' ? 'हल किया गया' : 'Resolved'}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        {issue.photo_url && (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={issue.photo_url} target="_blank" rel="noopener noreferrer">
+                              {language === 'hi' ? 'फोटो देखें' : 'View Photo'}
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="map" className="space-y-4">
-            <div className="bg-muted rounded-lg p-8 text-center">
-              <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-medium mb-2">Interactive Map</h3>
-              <p className="text-muted-foreground mb-4">
-                Map integration will show all reported issues with location pins
-              </p>
-              <Button>Set up Mapbox Integration</Button>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  {language === 'hi' ? 'समस्याओं का मानचित्र' : 'Issue Map'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <IssueMap 
+                  issues={issues} 
+                  language={language} 
+                  onIssueClick={handleIssueClick}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
