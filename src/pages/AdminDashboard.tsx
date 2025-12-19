@@ -23,10 +23,12 @@ export default function AdminDashboard() {
 
   const handleStatusUpdate = async (issueId: string, newStatus: Issue['status']) => {
     try {
-      await updateIssueStatus(issueId, newStatus);
+      await updateIssueStatus(issueId, newStatus, language);
       toast({
         title: language === 'hi' ? 'स्थिति अपडेट की गई' : 'Status Updated',
-        description: language === 'hi' ? 'समस्या की स्थिति सफलतापूर्वक अपडेट की गई' : 'Issue status has been updated successfully',
+        description: language === 'hi' 
+          ? 'समस्या की स्थिति सफलतापूर्वक अपडेट की गई। नागरिक को ईमेल भेजा गया।' 
+          : 'Issue status has been updated. Email notification sent to citizen.',
       });
     } catch (error) {
       toast({
