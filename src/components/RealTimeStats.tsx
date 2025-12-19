@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle, Clock, CheckCircle, TrendingUp } from "lucide-react";
 
 interface Stats {
@@ -34,7 +34,7 @@ export function RealTimeStats({ language }: RealTimeStatsProps) {
       const { count: pendingIssues } = await supabase
         .from('issues')
         .select('*', { count: 'exact', head: true })
-        .in('status', ['submitted', 'acknowledged', 'inProgress']);
+        .in('status', ['submitted', 'acknowledged', 'in_progress']);
 
       // Get resolved issues
       const { count: resolvedIssues } = await supabase

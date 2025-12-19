@@ -10,7 +10,7 @@ const statusConfig = {
     label: { en: "Acknowledged", hi: "स्वीकार किया गया" },
     className: "bg-status-acknowledged text-black",
   },
-  inProgress: {
+  in_progress: {
     label: { en: "In Progress", hi: "प्रगति में" },
     className: "bg-status-inProgress text-white",
   },

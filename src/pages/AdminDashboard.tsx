@@ -23,7 +23,7 @@ const mockIssues = [
     id: 1,
     category: "roads",
     description: "Large pothole on Main Street causing traffic issues",
-    status: "inProgress" as const,
+    status: "in_progress" as const,
     location: "Main Street, Sector 15",
     priority: "high",
     assignedTo: "Roads Dept.",
