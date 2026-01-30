@@ -8,24 +8,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIssues, Issue } from "@/hooks/useIssues";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useAdminData } from "@/hooks/useAdminData";
 import { useAuth } from "@/contexts/AuthContext";
 import { RealTimeStats } from "@/components/RealTimeStats";
 import { IssueMap } from "@/components/IssueMap";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn } from "lucide-react";
+import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn, Store, AlertTriangle, Users, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { AdminStallsManager } from "@/components/admin/AdminStallsManager";
+import { AdminAlertsManager } from "@/components/admin/AdminAlertsManager";
+import { AdminEventsManager } from "@/components/admin/AdminEventsManager";
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
   const { issues, loading, updateIssueStatus, refetch } = useIssues();
   const { isAdmin, loading: adminLoading } = useAdmin();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const adminData = useAdminData();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   // Show loading state while checking auth and admin status
   if (authLoading || adminLoading) {
@@ -127,6 +137,9 @@ export default function AdminDashboard() {
                 {language === 'hi' ? 'रीफ्रेश' : 'Refresh'}
               </Button>
               <LanguageToggle />
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -134,7 +147,7 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">
               {language === 'hi' ? 'अवलोकन' : 'Overview'}
             </TabsTrigger>
@@ -142,7 +155,19 @@ export default function AdminDashboard() {
               {language === 'hi' ? 'समस्याएं' : 'Issues'} ({issues.length})
             </TabsTrigger>
             <TabsTrigger value="map">
-              {language === 'hi' ? 'मानचित्र' : 'Map View'}
+              {language === 'hi' ? 'मानचित्र' : 'Map'}
+            </TabsTrigger>
+            <TabsTrigger value="stalls">
+              <Store className="h-4 w-4 mr-1" />
+              {language === 'hi' ? 'दुकानें' : 'Stalls'}
+            </TabsTrigger>
+            <TabsTrigger value="alerts">
+              <AlertTriangle className="h-4 w-4 mr-1" />
+              {language === 'hi' ? 'अलर्ट' : 'Alerts'}
+            </TabsTrigger>
+            <TabsTrigger value="events">
+              <Users className="h-4 w-4 mr-1" />
+              {language === 'hi' ? 'इवेंट्स' : 'Events'}
             </TabsTrigger>
           </TabsList>
 
@@ -296,6 +321,39 @@ export default function AdminDashboard() {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="stalls" className="space-y-4">
+            <AdminStallsManager 
+              stalls={adminData.stalls}
+              loading={adminData.loading}
+              onCreate={adminData.createStall}
+              onUpdate={adminData.updateStall}
+              onDelete={adminData.deleteStall}
+              language={language}
+            />
+          </TabsContent>
+
+          <TabsContent value="alerts" className="space-y-4">
+            <AdminAlertsManager 
+              alerts={adminData.alerts}
+              loading={adminData.loading}
+              onCreate={adminData.createAlert}
+              onUpdate={adminData.updateAlert}
+              onDelete={adminData.deleteAlert}
+              language={language}
+            />
+          </TabsContent>
+
+          <TabsContent value="events" className="space-y-4">
+            <AdminEventsManager 
+              events={adminData.events}
+              loading={adminData.loading}
+              onCreate={adminData.createEvent}
+              onUpdate={adminData.updateEvent}
+              onDelete={adminData.deleteEvent}
+              language={language}
+            />
           </TabsContent>
         </Tabs>
       </div>

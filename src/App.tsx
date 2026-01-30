@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import ReportIssue from "./pages/ReportIssue";
 import MyReports from "./pages/MyReports";
 import AdminDashboard from "./pages/AdminDashboard";
+import CitizenDashboard from "./pages/CitizenDashboard";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/report" element={<ReportIssue />} />
               <Route path="/my-reports" element={<MyReports />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/citizen-dashboard" element={<CitizenDashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -6,7 +6,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface NotificationRequest {
@@ -143,15 +143,79 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error("No authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Create Supabase client with the user's JWT
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    // Get the authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error("Auth error:", authError);
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Check if user is admin using the is_admin function
+    const { data: isAdmin, error: adminError } = await supabaseClient.rpc('is_admin', { 
+      check_user_id: user.id 
+    });
+    
+    if (adminError || !isAdmin) {
+      console.error("Admin check failed:", adminError);
+      return new Response(
+        JSON.stringify({ error: "Forbidden: Admin access required" }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const data: NotificationRequest = await req.json();
     console.log("Notification request:", JSON.stringify(data));
 
     const { issueId, userEmail, issueTitle, oldStatus, newStatus, language } = data;
 
-    if (!userEmail || !issueTitle || !newStatus) {
+    if (!userEmail || !issueTitle || !newStatus || !issueId) {
       console.error("Missing required fields");
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate that the issue exists and email matches
+    const { data: issue, error: issueError } = await supabaseClient
+      .from('issues')
+      .select('user_email, title')
+      .eq('id', issueId)
+      .single();
+    
+    if (issueError || !issue) {
+      console.error("Issue not found:", issueError);
+      return new Response(
+        JSON.stringify({ error: "Issue not found" }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Verify the email matches the issue's user_email
+    if (issue.user_email !== userEmail) {
+      console.error("Email mismatch");
+      return new Response(
+        JSON.stringify({ error: "Invalid request" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
