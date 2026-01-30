@@ -3,14 +3,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/hooks/useAdmin";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, FileText, Settings, Users, LogOut, User } from "lucide-react";
+import { MapPin, FileText, Users, LogOut, User, LayoutDashboard } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
 
   const handleSignOut = async () => {
     await signOut();
@@ -18,7 +20,11 @@ const Index = () => {
 
   const handleAuthAction = () => {
     if (user) {
-      navigate("/my-reports");
+      if (isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/citizen-dashboard");
+      }
     } else {
       navigate("/auth");
     }
@@ -96,7 +102,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* My Reports / Login */}
+          {/* Dashboard / Login */}
           <Card>
             <CardContent className="p-4">
               <Button
@@ -106,7 +112,7 @@ const Index = () => {
               >
                 <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
                   {user ? (
-                    <FileText className="h-5 w-5 text-secondary-foreground" />
+                    <LayoutDashboard className="h-5 w-5 text-secondary-foreground" />
                   ) : (
                     <User className="h-5 w-5 text-secondary-foreground" />
                   )}
@@ -114,13 +120,17 @@ const Index = () => {
                 <div className="text-left">
                   <div className="font-medium">
                     {user 
-                      ? t("myReports", language)
+                      ? (isAdmin 
+                          ? (language === "hi" ? "एडमिन डैशबोर्ड" : "Admin Dashboard")
+                          : (language === "hi" ? "नागरिक डैशबोर्ड" : "Citizen Dashboard"))
                       : (language === "hi" ? "लॉगिन करें" : "Sign In")
                     }
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {user 
-                      ? (language === "hi" ? "अपनी रिपोर्ट्स देखें" : "View your submitted reports")
+                      ? (isAdmin 
+                          ? (language === "hi" ? "समस्याओं का प्रबंधन करें" : "Manage issues and more")
+                          : (language === "hi" ? "दान, स्वयंसेवा और बहुत कुछ" : "Donations, volunteering & more"))
                       : (language === "hi" ? "खाता बनाएं या लॉगिन करें" : "Create account or sign in")
                     }
                   </div>
@@ -129,26 +139,51 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Admin Dashboard */}
-          <Card>
-            <CardContent className="p-4">
-              <Button
-                onClick={() => navigate("/admin")}
-                variant="ghost"
-                className="w-full justify-start gap-4 h-16"
-              >
-                <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                  <Users className="h-5 w-5 text-accent" />
-                </div>
-                <div className="text-left">
-                  <div className="font-medium">Staff Portal</div>
-                  <div className="text-sm text-muted-foreground">
-                    {language === "hi" ? "प्रशासनिक डैशबोर्ड" : "Administrative dashboard"}
+          {/* My Reports (for logged-in users) */}
+          {user && (
+            <Card>
+              <CardContent className="p-4">
+                <Button
+                  onClick={() => navigate("/my-reports")}
+                  variant="ghost"
+                  className="w-full justify-start gap-4 h-16"
+                >
+                  <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-secondary-foreground" />
                   </div>
-                </div>
-              </Button>
-            </CardContent>
-          </Card>
+                  <div className="text-left">
+                    <div className="font-medium">{t("myReports", language)}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {language === "hi" ? "अपनी रिपोर्ट्स देखें" : "View your submitted reports"}
+                    </div>
+                  </div>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Admin Dashboard (only for admins) */}
+          {isAdmin && (
+            <Card>
+              <CardContent className="p-4">
+                <Button
+                  onClick={() => navigate("/admin")}
+                  variant="ghost"
+                  className="w-full justify-start gap-4 h-16"
+                >
+                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                    <Users className="h-5 w-5 text-accent" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-medium">Staff Portal</div>
+                    <div className="text-sm text-muted-foreground">
+                      {language === "hi" ? "प्रशासनिक डैशबोर्ड" : "Administrative dashboard"}
+                    </div>
+                  </div>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 

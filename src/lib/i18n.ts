@@ -5,6 +5,8 @@ export const translations = {
     reportIssue: "Report Issue",
     myReports: "My Reports",
     dashboard: "Dashboard",
+    citizenDashboard: "Dashboard",
+    adminDashboard: "Admin Dashboard",
     
     // Issue Categories
     waste: "Waste Management",
@@ -20,6 +22,10 @@ export const translations = {
     edit: "Edit",
     delete: "Delete",
     assign: "Assign",
+    donate: "Donate",
+    volunteer: "Volunteer",
+    register: "Register",
+    viewAll: "View All",
     
     // Status
     submitted: "Submitted",
@@ -44,6 +50,47 @@ export const translations = {
     pendingIssues: "Pending Issues",
     resolvedIssues: "Resolved Issues",
     averageResolutionTime: "Avg Resolution Time",
+    
+    // New Features
+    donations: "Donations",
+    volunteering: "Volunteering",
+    localStalls: "Local Stalls",
+    discounts: "Discounts",
+    emergencyAlerts: "Emergency Alerts",
+    publicUpdates: "Public Updates",
+    camps: "Camps",
+    events: "Community Events",
+    meetups: "Meetups",
+    
+    // Donations
+    makeDonation: "Make a Donation",
+    donationAmount: "Amount",
+    donationPurpose: "Purpose",
+    anonymousDonation: "Make this donation anonymous",
+    totalDonations: "Total Donations",
+    
+    // Volunteering
+    becomeVolunteer: "Become a Volunteer",
+    yourSkills: "Your Skills",
+    availability: "Availability",
+    activeVolunteers: "Active Volunteers",
+    
+    // Stalls
+    localBusinesses: "Local Businesses",
+    discountOffers: "Discount Offers",
+    
+    // Events
+    upcomingEvents: "Upcoming Events",
+    registerForEvent: "Register for Event",
+    eventDetails: "Event Details",
+    participants: "Participants",
+    
+    // Alerts
+    activeAlerts: "Active Alerts",
+    criticalAlert: "Critical Alert",
+    highAlert: "High Priority",
+    mediumAlert: "Medium Priority",
+    lowAlert: "Low Priority",
   },
   hi: {
     // Navigation
@@ -51,6 +98,8 @@ export const translations = {
     reportIssue: "समस्या रिपोर्ट करें",
     myReports: "मेरी रिपोर्ट्स",
     dashboard: "डैशबोर्ड",
+    citizenDashboard: "डैशबोर्ड",
+    adminDashboard: "व्यवस्थापक डैशबोर्ड",
     
     // Issue Categories
     waste: "कचरा प्रबंधन",
@@ -66,6 +115,10 @@ export const translations = {
     edit: "संपादित करें",
     delete: "हटाएं",
     assign: "असाइन करें",
+    donate: "दान करें",
+    volunteer: "स्वयंसेवा करें",
+    register: "पंजीकरण करें",
+    viewAll: "सभी देखें",
     
     // Status
     submitted: "सबमिट किया गया",
@@ -90,6 +143,47 @@ export const translations = {
     pendingIssues: "लंबित समस्याएं",
     resolvedIssues: "हल की गई समस्याएं",
     averageResolutionTime: "औसत समाधान समय",
+    
+    // New Features
+    donations: "दान",
+    volunteering: "स्वयंसेवा",
+    localStalls: "स्थानीय दुकानें",
+    discounts: "छूट",
+    emergencyAlerts: "आपातकालीन अलर्ट",
+    publicUpdates: "सार्वजनिक अपडेट",
+    camps: "शिविर",
+    events: "सामुदायिक कार्यक्रम",
+    meetups: "मीटअप",
+    
+    // Donations
+    makeDonation: "दान करें",
+    donationAmount: "राशि",
+    donationPurpose: "उद्देश्य",
+    anonymousDonation: "इस दान को गुमनाम रखें",
+    totalDonations: "कुल दान",
+    
+    // Volunteering
+    becomeVolunteer: "स्वयंसेवक बनें",
+    yourSkills: "आपके कौशल",
+    availability: "उपलब्धता",
+    activeVolunteers: "सक्रिय स्वयंसेवक",
+    
+    // Stalls
+    localBusinesses: "स्थानीय व्यवसाय",
+    discountOffers: "छूट ऑफर",
+    
+    // Events
+    upcomingEvents: "आगामी कार्यक्रम",
+    registerForEvent: "कार्यक्रम के लिए पंजीकरण करें",
+    eventDetails: "कार्यक्रम विवरण",
+    participants: "प्रतिभागी",
+    
+    // Alerts
+    activeAlerts: "सक्रिय अलर्ट",
+    criticalAlert: "गंभीर अलर्ट",
+    highAlert: "उच्च प्राथमिकता",
+    mediumAlert: "मध्यम प्राथमिकता",
+    lowAlert: "कम प्राथमिकता",
   },
 } as const;
 
