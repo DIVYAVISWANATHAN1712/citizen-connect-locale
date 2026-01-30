@@ -7,19 +7,87 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIssues, Issue } from "@/hooks/useIssues";
+import { useAdmin } from "@/hooks/useAdmin";
+import { useAuth } from "@/contexts/AuthContext";
 import { RealTimeStats } from "@/components/RealTimeStats";
 import { IssueMap } from "@/components/IssueMap";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, Users, Calendar, RefreshCw } from "lucide-react";
+import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
   const { issues, loading, updateIssueStatus, refetch } = useIssues();
+  const { isAdmin, loading: adminLoading } = useAdmin();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+  // Show loading state while checking auth and admin status
+  if (authLoading || adminLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">
+            {language === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardContent className="pt-6 text-center">
+            <LogIn className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">
+              {language === 'hi' ? 'लॉगिन आवश्यक' : 'Login Required'}
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              {language === 'hi' 
+                ? 'इस पेज को एक्सेस करने के लिए कृपया लॉगिन करें।' 
+                : 'Please login to access this page.'}
+            </p>
+            <Button onClick={() => navigate('/auth')}>
+              {language === 'hi' ? 'लॉगिन करें' : 'Go to Login'}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show access denied if not an admin
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardContent className="pt-6 text-center">
+            <ShieldAlert className="h-16 w-16 text-destructive mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">
+              {language === 'hi' ? 'पहुंच अस्वीकृत' : 'Access Denied'}
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              {language === 'hi' 
+                ? 'इस पेज को एक्सेस करने के लिए आपको एडमिन अधिकारों की आवश्यकता है।' 
+                : 'You need administrator privileges to access this page.'}
+            </p>
+            <Button variant="outline" onClick={() => navigate('/')}>
+              {language === 'hi' ? 'होम पर जाएं' : 'Go to Home'}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const handleStatusUpdate = async (issueId: string, newStatus: Issue['status']) => {
     try {

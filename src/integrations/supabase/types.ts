@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           comment: string | null
@@ -190,7 +208,40 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_update_issue_status: {
+        Args: {
+          p_issue_id: string
+          p_resolved_at?: string
+          p_status: Database["public"]["Enums"]["issue_status"]
+        }
+        Returns: {
+          address: string | null
+          after_photo_url: string | null
+          before_photo_url: string | null
+          category: Database["public"]["Enums"]["issue_category"]
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          photo_url: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["issue_status"]
+          title: string
+          updated_at: string
+          upvotes: number | null
+          user_email: string
+          user_id: string
+          user_phone: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "issues"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      is_admin: { Args: { check_user_id: string }; Returns: boolean }
     }
     Enums: {
       issue_category: "waste" | "roads" | "streetlights" | "water" | "other"

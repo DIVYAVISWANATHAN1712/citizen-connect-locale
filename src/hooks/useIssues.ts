@@ -78,19 +78,20 @@ export function useIssues() {
     const currentIssue = issues.find(i => i.id === id);
     const oldStatus = currentIssue?.status;
 
-    const updateData: Partial<Issue> = { status };
-    if (status === 'resolved') {
-      updateData.resolved_at = new Date().toISOString();
-    }
-
+    // Use the secure admin RPC function for status updates
     const { data: issue, error } = await supabase
-      .from('issues')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+      .rpc('admin_update_issue_status', {
+        p_issue_id: id,
+        p_status: status,
+        p_resolved_at: status === 'resolved' ? new Date().toISOString() : null
+      });
 
-    if (error) throw error;
+    if (error) {
+      if (error.message.includes('Unauthorized')) {
+        throw new Error('You do not have permission to update issue status');
+      }
+      throw error;
+    }
 
     // Create notification for status update
     if (issue) {
