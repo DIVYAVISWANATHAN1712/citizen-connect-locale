@@ -19,6 +19,7 @@ import { VolunteerDialog } from "@/components/citizen/VolunteerDialog";
 import { EmergencyAlertsCard } from "@/components/citizen/EmergencyAlertsCard";
 import { LocalStallsCard } from "@/components/citizen/LocalStallsCard";
 import { EventsCard } from "@/components/citizen/EventsCard";
+import { RequestsCard } from "@/components/citizen/RequestsCard";
 
 export default function CitizenDashboard() {
   const navigate = useNavigate();
@@ -185,6 +186,14 @@ export default function CitizenDashboard() {
             events={events} 
             language={language} 
             onRegister={registerForEvent}
+          />
+
+          {/* My Requests - Certificates & Permissions */}
+          <RequestsCard 
+            language={language}
+            donations={donations}
+            events={events.map(e => ({ id: e.id, title_en: e.title_en, title_hi: e.title_hi }))}
+            isVolunteer={!!userVolunteerProfile}
           />
 
           {/* Local Stalls & Discounts */}

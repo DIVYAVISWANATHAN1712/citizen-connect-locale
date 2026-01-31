@@ -14,12 +14,13 @@ import { RealTimeStats } from "@/components/RealTimeStats";
 import { IssueMap } from "@/components/IssueMap";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn, Store, AlertTriangle, Users, LogOut } from "lucide-react";
+import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn, Store, AlertTriangle, Users, LogOut, ClipboardCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { AdminStallsManager } from "@/components/admin/AdminStallsManager";
 import { AdminAlertsManager } from "@/components/admin/AdminAlertsManager";
 import { AdminEventsManager } from "@/components/admin/AdminEventsManager";
+import { AdminApprovalsManager } from "@/components/admin/AdminApprovalsManager";
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
@@ -147,7 +148,7 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">
               {language === 'hi' ? 'अवलोकन' : 'Overview'}
             </TabsTrigger>
@@ -156,6 +157,10 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="map">
               {language === 'hi' ? 'मानचित्र' : 'Map'}
+            </TabsTrigger>
+            <TabsTrigger value="approvals">
+              <ClipboardCheck className="h-4 w-4 mr-1" />
+              {language === 'hi' ? 'अनुमोदन' : 'Approvals'}
             </TabsTrigger>
             <TabsTrigger value="stalls">
               <Store className="h-4 w-4 mr-1" />
@@ -321,6 +326,10 @@ export default function AdminDashboard() {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="approvals" className="space-y-4">
+            <AdminApprovalsManager language={language} />
           </TabsContent>
 
           <TabsContent value="stalls" className="space-y-4">

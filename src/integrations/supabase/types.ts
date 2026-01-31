@@ -32,6 +32,77 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_requests: {
+        Row: {
+          admin_notes: string | null
+          certificate_generated_at: string | null
+          certificate_number: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          proposed_event_date: string | null
+          proposed_event_description: string | null
+          proposed_event_location: string | null
+          proposed_event_title: string | null
+          reference_id: string | null
+          request_type: Database["public"]["Enums"]["approval_request_type"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          stall_description: string | null
+          status: Database["public"]["Enums"]["approval_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          certificate_generated_at?: string | null
+          certificate_number?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          proposed_event_date?: string | null
+          proposed_event_description?: string | null
+          proposed_event_location?: string | null
+          proposed_event_title?: string | null
+          reference_id?: string | null
+          request_type: Database["public"]["Enums"]["approval_request_type"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stall_description?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          certificate_generated_at?: string | null
+          certificate_number?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          proposed_event_date?: string | null
+          proposed_event_description?: string | null
+          proposed_event_location?: string | null
+          proposed_event_title?: string | null
+          reference_id?: string | null
+          request_type?: Database["public"]["Enums"]["approval_request_type"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stall_description?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_requests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "community_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_events: {
         Row: {
           created_at: string
@@ -498,10 +569,22 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      generate_certificate_number: {
+        Args: {
+          request_type: Database["public"]["Enums"]["approval_request_type"]
+        }
+        Returns: string
+      }
       is_admin: { Args: { check_user_id: string }; Returns: boolean }
     }
     Enums: {
       alert_severity: "low" | "medium" | "high" | "critical"
+      approval_request_type:
+        | "donation_certificate"
+        | "volunteer_certificate"
+        | "event_stall"
+        | "event_organizer"
+      approval_status: "pending" | "approved" | "rejected"
       event_type: "camp" | "community_event" | "meetup"
       issue_category: "waste" | "roads" | "streetlights" | "water" | "other"
       issue_status: "submitted" | "acknowledged" | "in_progress" | "resolved"
@@ -633,6 +716,13 @@ export const Constants = {
   public: {
     Enums: {
       alert_severity: ["low", "medium", "high", "critical"],
+      approval_request_type: [
+        "donation_certificate",
+        "volunteer_certificate",
+        "event_stall",
+        "event_organizer",
+      ],
+      approval_status: ["pending", "approved", "rejected"],
       event_type: ["camp", "community_event", "meetup"],
       issue_category: ["waste", "roads", "streetlights", "water", "other"],
       issue_status: ["submitted", "acknowledged", "in_progress", "resolved"],
