@@ -85,9 +85,9 @@ export function AdminAlertsManager({ alerts, loading, onCreate, onUpdate, onDele
     e.preventDefault();
     const data = {
       title_en: formData.title_en,
-      title_hi: formData.title_hi,
+      title_hi: formData.title_en, // mirror English (DB column is NOT NULL)
       message_en: formData.message_en,
-      message_hi: formData.message_hi,
+      message_hi: formData.message_en,
       severity: formData.severity,
       expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
       is_active: formData.is_active,
@@ -129,43 +129,22 @@ export function AdminAlertsManager({ alerts, loading, onCreate, onUpdate, onDele
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Title (English) *</Label>
-                  <Input
-                    value={formData.title_en}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>शीर्षक (हिंदी) *</Label>
-                  <Input
-                    value={formData.title_hi}
-                    onChange={(e) => setFormData({ ...formData, title_hi: e.target.value })}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Title <span className="text-destructive">*</span></Label>
+                <Input
+                  value={formData.title_en}
+                  onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                  required
+                />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Message (English) *</Label>
-                  <Textarea
-                    value={formData.message_en}
-                    onChange={(e) => setFormData({ ...formData, message_en: e.target.value })}
-                    rows={3}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>संदेश (हिंदी) *</Label>
-                  <Textarea
-                    value={formData.message_hi}
-                    onChange={(e) => setFormData({ ...formData, message_hi: e.target.value })}
-                    rows={3}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Message <span className="text-destructive">*</span></Label>
+                <Textarea
+                  value={formData.message_en}
+                  onChange={(e) => setFormData({ ...formData, message_en: e.target.value })}
+                  rows={3}
+                  required
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

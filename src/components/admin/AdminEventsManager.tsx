@@ -93,9 +93,9 @@ export function AdminEventsManager({ events, loading, onCreate, onUpdate, onDele
     e.preventDefault();
     const data = {
       title_en: formData.title_en,
-      title_hi: formData.title_hi,
+      title_hi: formData.title_en, // mirror English (DB column is NOT NULL)
       description_en: formData.description_en || null,
-      description_hi: formData.description_hi || null,
+      description_hi: formData.description_en || null,
       event_type: formData.event_type,
       location: formData.location || null,
       start_date: new Date(formData.start_date).toISOString(),
@@ -141,7 +141,7 @@ export function AdminEventsManager({ events, loading, onCreate, onUpdate, onDele
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               <div className="space-y-2">
-                <Label>{language === "hi" ? "प्रकार" : "Event Type"} *</Label>
+                <Label>Event Type <span className="text-destructive">*</span></Label>
                 <Select
                   value={formData.event_type}
                   onValueChange={(value: any) => setFormData({ ...formData, event_type: value })}
@@ -150,47 +150,27 @@ export function AdminEventsManager({ events, loading, onCreate, onUpdate, onDele
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="camp">Camp / शिविर</SelectItem>
-                    <SelectItem value="community_event">Community Event / सामुदायिक कार्यक्रम</SelectItem>
-                    <SelectItem value="meetup">Meetup / मीटअप</SelectItem>
+                    <SelectItem value="camp">Camp</SelectItem>
+                    <SelectItem value="community_event">Community Event</SelectItem>
+                    <SelectItem value="meetup">Meetup</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Title (English) *</Label>
-                  <Input
-                    value={formData.title_en}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>शीर्षक (हिंदी) *</Label>
-                  <Input
-                    value={formData.title_hi}
-                    onChange={(e) => setFormData({ ...formData, title_hi: e.target.value })}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Title <span className="text-destructive">*</span></Label>
+                <Input
+                  value={formData.title_en}
+                  onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                  required
+                />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Description (English)</Label>
-                  <Textarea
-                    value={formData.description_en}
-                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                    rows={2}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>विवरण (हिंदी)</Label>
-                  <Textarea
-                    value={formData.description_hi}
-                    onChange={(e) => setFormData({ ...formData, description_hi: e.target.value })}
-                    rows={2}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <Textarea
+                  value={formData.description_en}
+                  onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                  rows={2}
+                />
               </div>
               <div className="space-y-2">
                 <Label>{language === "hi" ? "स्थान" : "Location"}</Label>
@@ -202,7 +182,7 @@ export function AdminEventsManager({ events, loading, onCreate, onUpdate, onDele
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>{language === "hi" ? "आरंभ" : "Start Date"} *</Label>
+                  <Label>Start Date <span className="text-destructive">*</span></Label>
                   <Input
                     type="datetime-local"
                     value={formData.start_date}
