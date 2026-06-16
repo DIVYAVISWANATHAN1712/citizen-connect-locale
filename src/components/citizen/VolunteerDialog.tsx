@@ -89,7 +89,7 @@ export function VolunteerDialog({ open, onOpenChange, onSubmit, existingProfile,
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>{language === "hi" ? "पूरा नाम" : "Full Name"} *</Label>
+            <Label>{language === "hi" ? "पूरा नाम" : "Full Name"} <span className="text-destructive">*</span></Label>
             <Input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}

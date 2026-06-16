@@ -125,7 +125,7 @@ export default function Auth() {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  {language === "hi" ? "ईमेल पता" : "Email Address"} *
+                  {language === "hi" ? "ईमेल पता" : "Email Address"} <span className="text-destructive">*</span>
                 </label>
                 <Input
                   type="email"
@@ -155,7 +155,7 @@ export default function Auth() {
               {/* Password */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  {language === "hi" ? "पासवर्ड" : "Password"} *
+                  {language === "hi" ? "पासवर्ड" : "Password"} <span className="text-destructive">*</span>
                 </label>
                 <Input
                   type="password"

@@ -210,7 +210,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>{language === "hi" ? "इवेंट शीर्षक" : "Event Title"} *</Label>
+                  <Label>Event Title <span className="text-destructive">*</span></Label>
                   <Input
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
@@ -228,7 +228,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>{language === "hi" ? "तिथि" : "Date"} *</Label>
+                    <Label>Date <span className="text-destructive">*</span></Label>
                     <Input
                       type="datetime-local"
                       value={newEvent.date}
@@ -236,7 +236,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>{language === "hi" ? "स्थान" : "Location"} *</Label>
+                    <Label>Location <span className="text-destructive">*</span></Label>
                     <Input
                       value={newEvent.location}
                       onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}

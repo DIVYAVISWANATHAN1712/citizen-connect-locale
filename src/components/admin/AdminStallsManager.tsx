@@ -121,7 +121,7 @@ export function AdminStallsManager({ stalls, loading, onCreate, onUpdate, onDele
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label>{language === "hi" ? "नाम" : "Name"} *</Label>
+                <Label>Name <span className="text-destructive">*</span></Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -129,7 +129,7 @@ export function AdminStallsManager({ stalls, loading, onCreate, onUpdate, onDele
                 />
               </div>
               <div className="space-y-2">
-                <Label>{language === "hi" ? "श्रेणी" : "Category"} *</Label>
+                <Label>Category <span className="text-destructive">*</span></Label>
                 <select
                   className="w-full p-2 border rounded-md"
                   value={formData.category}
