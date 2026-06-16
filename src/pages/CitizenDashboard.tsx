@@ -199,38 +199,6 @@ export default function CitizenDashboard() {
           {/* Local Stalls & Discounts */}
           <LocalStallsCard stalls={stalls} language={language} />
 
-          {/* Community Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                {language === "hi" ? "समुदाय" : "Community"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-500" />
-                  <span>{language === "hi" ? "सक्रिय स्वयंसेवक" : "Active Volunteers"}</span>
-                </div>
-                <Badge variant="secondary">{volunteers.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-red-500" />
-                  <span>{language === "hi" ? "कुल दान" : "Total Donations"}</span>
-                </div>
-                <Badge variant="secondary">₹{donations.reduce((sum, d) => sum + Number(d.amount), 0).toLocaleString()}</Badge>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-green-500" />
-                  <span>{language === "hi" ? "आगामी कार्यक्रम" : "Upcoming Events"}</span>
-                </div>
-                <Badge variant="secondary">{events.length}</Badge>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Dialogs */}

@@ -148,7 +148,7 @@ export default function ReportIssue() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    {language === "hi" ? "ईमेल पता" : "Email Address"} *
+                    {language === "hi" ? "ईमेल पता" : "Email Address"} <span className="text-destructive">*</span>
                   </label>
                   <Input
                     type="email"
@@ -176,7 +176,7 @@ export default function ReportIssue() {
               {/* Category */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  {t("category", language)} *
+                  {t("category", language)} <span className="text-destructive">*</span>
                 </label>
                 <Select onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
                   <SelectTrigger>
@@ -195,7 +195,7 @@ export default function ReportIssue() {
               {/* Title */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  {language === "hi" ? "समस्या का शीर्षक" : "Issue Title"} *
+                  {language === "hi" ? "समस्या का शीर्षक" : "Issue Title"} <span className="text-destructive">*</span>
                 </label>
                 <Input
                   value={formData.title}
@@ -208,7 +208,7 @@ export default function ReportIssue() {
               {/* Description */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  {t("description", language)} *
+                  {t("description", language)} <span className="text-destructive">*</span>
                 </label>
                 <Textarea
                   value={formData.description}
