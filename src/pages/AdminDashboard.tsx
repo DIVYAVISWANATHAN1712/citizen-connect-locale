@@ -30,8 +30,9 @@ export default function AdminDashboard() {
   const adminData = useAdminData();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("issues");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const handleSignOut = async () => {
     await signOut();
@@ -148,10 +149,7 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="overview">
-              {language === 'hi' ? 'अवलोकन' : 'Overview'}
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="issues">
               {language === 'hi' ? 'समस्याएं' : 'Issues'} ({issues.length})
             </TabsTrigger>
@@ -176,75 +174,48 @@ export default function AdminDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
-            {/* Real-time Stats */}
-            <RealTimeStats language={language} />
-
-            {/* Recent Issues from Database */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{language === 'hi' ? 'हाल की समस्याएं' : 'Recent Issues'}</CardTitle>
-                <Badge variant="outline">{language === 'hi' ? 'लाइव' : 'Live'}</Badge>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  </div>
-                ) : issues.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    {language === 'hi' ? 'कोई समस्या नहीं मिली' : 'No issues found'}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {issues.slice(0, 5).map((issue) => (
-                      <div key={issue.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="space-y-1 flex-1">
-                          <p className="font-medium">{issue.title}</p>
-                          <p className="text-sm text-muted-foreground line-clamp-1">{issue.description}</p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {issue.address || `${issue.latitude?.toFixed(4)}, ${issue.longitude?.toFixed(4)}`}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {new Date(issue.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{t(issue.category, language)}</Badge>
-                          <StatusBadge status={issue.status} language={language} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="issues" className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-4 flex-wrap">
               <h2 className="text-xl font-semibold">
                 {language === 'hi' ? 'सभी समस्याएं' : 'All Issues'}
               </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {language === 'hi' ? 'स्थिति फ़िल्टर:' : 'Filter by status:'}
+                </span>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{language === 'hi' ? 'सभी' : 'All'}</SelectItem>
+                    <SelectItem value="submitted">{language === 'hi' ? 'सबमिट किया गया' : 'Submitted'}</SelectItem>
+                    <SelectItem value="acknowledged">{language === 'hi' ? 'स्वीकार किया गया' : 'Acknowledged'}</SelectItem>
+                    <SelectItem value="in_progress">{language === 'hi' ? 'प्रगति में' : 'In Progress'}</SelectItem>
+                    <SelectItem value="resolved">{language === 'hi' ? 'हल किया गया' : 'Resolved'}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
               </div>
-            ) : issues.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12 text-muted-foreground">
-                  {language === 'hi' ? 'कोई समस्या नहीं मिली' : 'No issues found'}
-                </CardContent>
-              </Card>
-            ) : (
+            ) : (() => {
+              const filteredIssues = statusFilter === "all" ? issues : issues.filter(i => i.status === statusFilter);
+              if (filteredIssues.length === 0) {
+                return (
+                  <Card>
+                    <CardContent className="text-center py-12 text-muted-foreground">
+                      {language === 'hi' ? 'कोई समस्या नहीं मिली' : 'No issues found'}
+                    </CardContent>
+                  </Card>
+                );
+              }
+              return (
               <div className="space-y-4">
-                {issues.map((issue) => (
+                {filteredIssues.map((issue) => (
                   <Card key={issue.id} className={selectedIssue?.id === issue.id ? 'ring-2 ring-primary' : ''}>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-3">
@@ -307,7 +278,8 @@ export default function AdminDashboard() {
                   </Card>
                 ))}
               </div>
-            )}
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="map" className="space-y-4">
