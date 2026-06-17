@@ -14,13 +14,15 @@ import { RealTimeStats } from "@/components/RealTimeStats";
 import { IssueMap } from "@/components/IssueMap";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn, Store, AlertTriangle, Users, LogOut, ClipboardCheck } from "lucide-react";
+import { MapPin, Calendar, RefreshCw, ShieldAlert, LogIn, Store, AlertTriangle, Users, LogOut, ClipboardCheck, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { AdminStallsManager } from "@/components/admin/AdminStallsManager";
 import { AdminAlertsManager } from "@/components/admin/AdminAlertsManager";
 import { AdminEventsManager } from "@/components/admin/AdminEventsManager";
 import { AdminApprovalsManager } from "@/components/admin/AdminApprovalsManager";
+import { AdminVolunteersManager } from "@/components/admin/AdminVolunteersManager";
+import { DonationsAdminCard } from "@/components/admin/DonationsAdminCard";
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
@@ -149,29 +151,15 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="issues">
-              {language === 'hi' ? 'समस्याएं' : 'Issues'} ({issues.length})
-            </TabsTrigger>
-            <TabsTrigger value="map">
-              {language === 'hi' ? 'मानचित्र' : 'Map'}
-            </TabsTrigger>
-            <TabsTrigger value="approvals">
-              <ClipboardCheck className="h-4 w-4 mr-1" />
-              {language === 'hi' ? 'अनुमोदन' : 'Approvals'}
-            </TabsTrigger>
-            <TabsTrigger value="stalls">
-              <Store className="h-4 w-4 mr-1" />
-              {language === 'hi' ? 'दुकानें' : 'Stalls'}
-            </TabsTrigger>
-            <TabsTrigger value="alerts">
-              <AlertTriangle className="h-4 w-4 mr-1" />
-              {language === 'hi' ? 'अलर्ट' : 'Alerts'}
-            </TabsTrigger>
-            <TabsTrigger value="events">
-              <Users className="h-4 w-4 mr-1" />
-              {language === 'hi' ? 'इवेंट्स' : 'Events'}
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-8">
+            <TabsTrigger value="issues">Issues ({issues.length})</TabsTrigger>
+            <TabsTrigger value="map">Map</TabsTrigger>
+            <TabsTrigger value="approvals"><ClipboardCheck className="h-4 w-4 mr-1" />Approvals</TabsTrigger>
+            <TabsTrigger value="stalls"><Store className="h-4 w-4 mr-1" />Stalls</TabsTrigger>
+            <TabsTrigger value="alerts"><AlertTriangle className="h-4 w-4 mr-1" />Alerts</TabsTrigger>
+            <TabsTrigger value="events"><Users className="h-4 w-4 mr-1" />Events</TabsTrigger>
+            <TabsTrigger value="volunteers"><Users className="h-4 w-4 mr-1" />Volunteers</TabsTrigger>
+            <TabsTrigger value="donations"><Heart className="h-4 w-4 mr-1" />Donations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="issues" className="space-y-4">
@@ -335,6 +323,14 @@ export default function AdminDashboard() {
               onDelete={adminData.deleteEvent}
               language={language}
             />
+          </TabsContent>
+
+          <TabsContent value="volunteers" className="space-y-4">
+            <AdminVolunteersManager />
+          </TabsContent>
+
+          <TabsContent value="donations" className="space-y-4">
+            <DonationsAdminCard />
           </TabsContent>
         </Tabs>
       </div>
