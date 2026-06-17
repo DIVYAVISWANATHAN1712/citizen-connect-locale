@@ -209,6 +209,7 @@ export type Database = {
           message_en: string
           message_hi: string
           severity: Database["public"]["Enums"]["alert_severity"]
+          starts_at: string | null
           title_en: string
           title_hi: string
           updated_at: string
@@ -222,6 +223,7 @@ export type Database = {
           message_en: string
           message_hi: string
           severity?: Database["public"]["Enums"]["alert_severity"]
+          starts_at?: string | null
           title_en: string
           title_hi: string
           updated_at?: string
@@ -235,6 +237,7 @@ export type Database = {
           message_en?: string
           message_hi?: string
           severity?: Database["public"]["Enums"]["alert_severity"]
+          starts_at?: string | null
           title_en?: string
           title_hi?: string
           updated_at?: string
@@ -403,8 +406,10 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          discount_end_date: string | null
           discount_info: string | null
           discount_percentage: number | null
+          discount_start_date: string | null
           id: string
           is_active: boolean | null
           latitude: number | null
@@ -419,8 +424,10 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
+          discount_end_date?: string | null
           discount_info?: string | null
           discount_percentage?: number | null
+          discount_start_date?: string | null
           id?: string
           is_active?: boolean | null
           latitude?: number | null
@@ -435,8 +442,10 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          discount_end_date?: string | null
           discount_info?: string | null
           discount_percentage?: number | null
+          discount_start_date?: string | null
           id?: string
           is_active?: boolean | null
           latitude?: number | null
@@ -495,11 +504,14 @@ export type Database = {
       volunteers: {
         Row: {
           availability: string | null
+          availability_hours: string | null
+          availability_type: string | null
           created_at: string
           email: string
           full_name: string
           id: string
           is_active: boolean | null
+          is_self: boolean
           phone: string | null
           skills: string[] | null
           updated_at: string
@@ -507,11 +519,14 @@ export type Database = {
         }
         Insert: {
           availability?: string | null
+          availability_hours?: string | null
+          availability_type?: string | null
           created_at?: string
           email: string
           full_name: string
           id?: string
           is_active?: boolean | null
+          is_self?: boolean
           phone?: string | null
           skills?: string[] | null
           updated_at?: string
@@ -519,11 +534,14 @@ export type Database = {
         }
         Update: {
           availability?: string | null
+          availability_hours?: string | null
+          availability_type?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
           is_active?: boolean | null
+          is_self?: boolean
           phone?: string | null
           skills?: string[] | null
           updated_at?: string
