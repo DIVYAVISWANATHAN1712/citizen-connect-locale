@@ -13,6 +13,8 @@ export interface LocalStall {
   phone: string | null;
   discount_info: string | null;
   discount_percentage: number | null;
+  discount_start_date: string | null;
+  discount_end_date: string | null;
   photo_url: string | null;
   is_active: boolean;
 }
@@ -25,6 +27,7 @@ export interface EmergencyAlert {
   message_hi: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   is_active: boolean;
+  starts_at: string | null;
   expires_at: string | null;
   created_at: string;
 }
