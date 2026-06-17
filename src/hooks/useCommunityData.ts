@@ -20,7 +20,10 @@ export interface Volunteer {
   phone: string | null;
   skills: string[] | null;
   availability: string | null;
+  availability_type: string | null;
+  availability_hours: string | null;
   is_active: boolean;
+  is_self: boolean;
 }
 
 export interface LocalStall {
@@ -32,6 +35,8 @@ export interface LocalStall {
   phone: string | null;
   discount_info: string | null;
   discount_percentage: number | null;
+  discount_start_date: string | null;
+  discount_end_date: string | null;
   photo_url: string | null;
   is_active: boolean;
 }
@@ -44,6 +49,7 @@ export interface EmergencyAlert {
   message_hi: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   is_active: boolean;
+  starts_at: string | null;
   expires_at: string | null;
   created_at: string;
 }
@@ -77,18 +83,24 @@ export function useCommunityData() {
   const fetchAll = async () => {
     setLoading(true);
     try {
+      const nowIso = new Date().toISOString();
       const [donationsRes, volunteersRes, stallsRes, alertsRes, eventsRes] = await Promise.all([
         supabase.from('donations').select('*').order('created_at', { ascending: false }).limit(10),
-        supabase.from('volunteers').select('*').eq('is_active', true),
+        // Active list shown to citizens excludes self-registered volunteers
+        supabase.from('volunteers').select('*').eq('is_active', true).eq('is_self', false).order('full_name'),
         supabase.from('local_stalls').select('*').eq('is_active', true),
         supabase.from('emergency_alerts').select('*').eq('is_active', true).order('severity', { ascending: false }),
-        supabase.from('community_events').select('*').eq('is_active', true).gte('start_date', new Date().toISOString()).order('start_date'),
+        supabase.from('community_events').select('*').eq('is_active', true).gte('start_date', nowIso).order('start_date'),
       ]);
 
       if (donationsRes.data) setDonations(donationsRes.data);
-      if (volunteersRes.data) setVolunteers(volunteersRes.data);
-      if (stallsRes.data) setStalls(stallsRes.data);
-      if (alertsRes.data) setAlerts(alertsRes.data);
+      if (volunteersRes.data) setVolunteers(volunteersRes.data as any);
+      if (stallsRes.data) setStalls(stallsRes.data as any);
+      if (alertsRes.data) {
+        // Hide alerts whose start time is still in the future
+        const visible = (alertsRes.data as any[]).filter(a => !a.starts_at || new Date(a.starts_at) <= new Date());
+        setAlerts(visible as any);
+      }
       if (eventsRes.data) setEvents(eventsRes.data);
 
       // Check if current user is a volunteer
@@ -97,8 +109,8 @@ export function useCommunityData() {
           .from('volunteers')
           .select('*')
           .eq('user_id', user.id)
-          .single();
-        setUserVolunteerProfile(volProfile);
+          .maybeSingle();
+        setUserVolunteerProfile(volProfile as any);
       }
     } catch (error) {
       console.error('Error fetching community data:', error);
@@ -136,7 +148,7 @@ export function useCommunityData() {
     return true;
   };
 
-  const registerAsVolunteer = async (data: { full_name: string; phone?: string; skills?: string[]; availability?: string }) => {
+  const registerAsVolunteer = async (data: { full_name: string; phone?: string; skills?: string[]; availability_type?: string; availability_hours?: string }) => {
     if (!user) {
       toast({ title: 'Please login to volunteer', variant: 'destructive' });
       return false;
@@ -148,8 +160,10 @@ export function useCommunityData() {
       full_name: data.full_name,
       phone: data.phone,
       skills: data.skills,
-      availability: data.availability,
+      availability_type: data.availability_type,
+      availability_hours: data.availability_hours,
       is_active: true,
+      is_self: true,
     }, { onConflict: 'user_id' });
 
     if (error) {
