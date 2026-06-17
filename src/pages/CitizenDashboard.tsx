@@ -20,6 +20,7 @@ import { EmergencyAlertsCard } from "@/components/citizen/EmergencyAlertsCard";
 import { LocalStallsCard } from "@/components/citizen/LocalStallsCard";
 import { EventsCard } from "@/components/citizen/EventsCard";
 import { RequestsCard } from "@/components/citizen/RequestsCard";
+import { VolunteersCard } from "@/components/citizen/VolunteersCard";
 
 export default function CitizenDashboard() {
   const navigate = useNavigate();
@@ -198,6 +199,9 @@ export default function CitizenDashboard() {
 
           {/* Local Stalls & Discounts */}
           <LocalStallsCard stalls={stalls} language={language} />
+
+          {/* Active Volunteers (admin-curated list) */}
+          <VolunteersCard volunteers={volunteers} />
 
         </div>
 

@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ClipboardCheck, Check, X, Eye, FileText, Calendar, Store, Users } from "lucide-react";
 import { Language } from "@/lib/i18n";
 import { useAdminApprovals, ApprovalRequestWithUser } from "@/hooks/useAdminApprovals";
@@ -24,6 +25,7 @@ export function AdminApprovalsManager({ language }: AdminApprovalsManagerProps) 
   const [selectedRequest, setSelectedRequest] = useState<ApprovalRequestWithUser | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [actionType, setActionType] = useState<'approve' | 'reject' | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
   const getRequestTypeLabel = (type: string) => {
     const labels: Record<string, { en: string; hi: string }> = {
@@ -77,8 +79,9 @@ export function AdminApprovalsManager({ language }: AdminApprovalsManagerProps) 
     setActionType(null);
   };
 
-  const pendingRequests = requests.filter(r => r.status === 'pending');
-  const processedRequests = requests.filter(r => r.status !== 'pending');
+  const filteredByType = typeFilter === "all" ? requests : requests.filter(r => r.request_type === typeFilter);
+  const pendingRequests = filteredByType.filter(r => r.status === 'pending');
+  const processedRequests = filteredByType.filter(r => r.status !== 'pending');
 
   const RequestCard = ({ request }: { request: ApprovalRequestWithUser }) => (
     <div className="p-4 border rounded-lg flex items-start justify-between gap-4">
@@ -179,15 +182,27 @@ export function AdminApprovalsManager({ language }: AdminApprovalsManagerProps) 
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <span className="text-sm text-muted-foreground">Filter by type:</span>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[220px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Requests</SelectItem>
+                <SelectItem value="donation_certificate">Donation Certificate</SelectItem>
+                <SelectItem value="volunteer_certificate">Volunteer Certificate</SelectItem>
+                <SelectItem value="event_stall">Event Stall Permission</SelectItem>
+                <SelectItem value="event_organizer">Event Organizer Permission</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Tabs defaultValue="pending">
             <TabsList className="mb-4">
-              <TabsTrigger value="pending">
-                {language === "hi" ? "लंबित" : "Pending"} ({pendingRequests.length})
-              </TabsTrigger>
-              <TabsTrigger value="processed">
-                {language === "hi" ? "संसाधित" : "Processed"} ({processedRequests.length})
-              </TabsTrigger>
+              <TabsTrigger value="pending">Pending ({pendingRequests.length})</TabsTrigger>
+              <TabsTrigger value="processed">Processed ({processedRequests.length})</TabsTrigger>
             </TabsList>
+            
             
             <TabsContent value="pending">
               {loading ? (
