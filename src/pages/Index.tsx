@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { t } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { MapPin, FileText, Users, LogOut, User, LayoutDashboard } from "lucide-react";
+import { MapPin, FileText, LogOut, User, LayoutDashboard } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
