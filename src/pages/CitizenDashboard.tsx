@@ -200,8 +200,13 @@ export default function CitizenDashboard() {
           {/* Local Stalls & Discounts */}
           <LocalStallsCard stalls={stalls} language={language} />
 
-          {/* Active Volunteers (admin-curated list) */}
-          <VolunteersCard volunteers={volunteers} />
+          {/* Volunteers (register + active list) */}
+          <VolunteersCard
+            volunteers={volunteers}
+            onRegisterClick={() => setVolunteerOpen(true)}
+            isRegistered={!!userVolunteerProfile}
+          />
+
 
         </div>
 
