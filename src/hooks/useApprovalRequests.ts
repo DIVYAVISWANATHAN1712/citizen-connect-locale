@@ -84,7 +84,11 @@ export function useApprovalRequests() {
     return true;
   };
 
-  const requestVolunteerCertificate = async () => {
+  const requestVolunteerCertificate = async (data: {
+    full_name: string;
+    event_name: string;
+    proof_photo_url?: string;
+  }) => {
     if (!user) {
       toast({ title: 'Please login', variant: 'destructive' });
       return false;
@@ -95,7 +99,7 @@ export function useApprovalRequests() {
       .from('volunteers')
       .select('id')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!volunteer) {
       toast({ title: 'Not a volunteer', description: 'You must register as a volunteer first', variant: 'destructive' });
@@ -106,7 +110,10 @@ export function useApprovalRequests() {
       user_id: user.id,
       request_type: 'volunteer_certificate' as ApprovalRequestType,
       reference_id: volunteer.id,
-    });
+      volunteer_full_name: data.full_name,
+      volunteer_event_name: data.event_name,
+      proof_photo_url: data.proof_photo_url ?? null,
+    } as any);
 
     if (error) {
       toast({ title: 'Error', description: 'Failed to submit request', variant: 'destructive' });
