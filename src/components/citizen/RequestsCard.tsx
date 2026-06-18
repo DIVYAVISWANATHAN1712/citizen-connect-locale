@@ -245,7 +245,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                     <SelectTrigger>
                       <SelectValue placeholder={language === "hi" ? "इवेंट चुनें" : "Select event"} />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" className="z-[100] max-h-[240px]">
                       {events.map(event => (
                         <SelectItem key={event.id} value={event.id}>
                           {language === "hi" ? event.title_hi : event.title_en}
