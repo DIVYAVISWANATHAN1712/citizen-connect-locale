@@ -40,6 +40,7 @@ export type Database = {
           created_at: string
           event_id: string | null
           id: string
+          proof_photo_url: string | null
           proposed_event_date: string | null
           proposed_event_description: string | null
           proposed_event_location: string | null
@@ -52,6 +53,8 @@ export type Database = {
           status: Database["public"]["Enums"]["approval_status"]
           updated_at: string
           user_id: string
+          volunteer_event_name: string | null
+          volunteer_full_name: string | null
         }
         Insert: {
           admin_notes?: string | null
@@ -60,6 +63,7 @@ export type Database = {
           created_at?: string
           event_id?: string | null
           id?: string
+          proof_photo_url?: string | null
           proposed_event_date?: string | null
           proposed_event_description?: string | null
           proposed_event_location?: string | null
@@ -72,6 +76,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["approval_status"]
           updated_at?: string
           user_id: string
+          volunteer_event_name?: string | null
+          volunteer_full_name?: string | null
         }
         Update: {
           admin_notes?: string | null
@@ -80,6 +86,7 @@ export type Database = {
           created_at?: string
           event_id?: string | null
           id?: string
+          proof_photo_url?: string | null
           proposed_event_date?: string | null
           proposed_event_description?: string | null
           proposed_event_location?: string | null
@@ -92,6 +99,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["approval_status"]
           updated_at?: string
           user_id?: string
+          volunteer_event_name?: string | null
+          volunteer_full_name?: string | null
         }
         Relationships: [
           {
