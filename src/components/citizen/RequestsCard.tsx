@@ -44,6 +44,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
   
   const [stallDialogOpen, setStallDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [volCertDialogOpen, setVolCertDialogOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
   const [stallDescription, setStallDescription] = useState("");
   const [newEvent, setNewEvent] = useState({
@@ -52,6 +53,10 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
     date: "",
     location: "",
   });
+  const [volCert, setVolCert] = useState({ full_name: "", event_name: "" });
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [uploadingProof, setUploadingProof] = useState(false);
+
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -139,16 +144,86 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-2">
           {isVolunteer && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => requestVolunteerCertificate()}
-              disabled={requests.some(r => r.request_type === 'volunteer_certificate' && r.status !== 'rejected')}
-            >
-              <FileText className="h-4 w-4 mr-1" />
-              {language === "hi" ? "स्वयंसेवक प्रमाणपत्र" : "Volunteer Certificate"}
-            </Button>
+            <Dialog open={volCertDialogOpen} onOpenChange={setVolCertDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={requests.some(r => r.request_type === 'volunteer_certificate' && r.status === 'pending')}
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  {language === "hi" ? "स्वयंसेवक प्रमाणपत्र" : "Volunteer Certificate"}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Request Volunteer Certificate</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Full Name <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={volCert.full_name}
+                      onChange={(e) => setVolCert({ ...volCert, full_name: e.target.value })}
+                      placeholder="Your full name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Event Name <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={volCert.event_name}
+                      onChange={(e) => setVolCert({ ...volCert, event_name: e.target.value })}
+                      placeholder="Event you volunteered for"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Proof Photo <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setProofFile(e.target.files?.[0] ?? null)}
+                    />
+                    {proofFile && <p className="text-xs text-muted-foreground">{proofFile.name}</p>}
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={!volCert.full_name || !volCert.event_name || !proofFile || uploadingProof}
+                    onClick={async () => {
+                      if (!proofFile) return;
+                      setUploadingProof(true);
+                      try {
+                        const { supabase } = await import("@/integrations/supabase/client");
+                        const ext = proofFile.name.split('.').pop();
+                        const path = `volunteer-proofs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                        const { error: upErr } = await supabase.storage
+                          .from('issue-photos')
+                          .upload(path, proofFile);
+                        if (upErr) throw upErr;
+                        const { data: pub } = supabase.storage.from('issue-photos').getPublicUrl(path);
+                        const success = await requestVolunteerCertificate({
+                          full_name: volCert.full_name,
+                          event_name: volCert.event_name,
+                          proof_photo_url: pub.publicUrl,
+                        });
+                        if (success) {
+                          setVolCertDialogOpen(false);
+                          setVolCert({ full_name: "", event_name: "" });
+                          setProofFile(null);
+                        }
+                      } catch (err) {
+                        console.error(err);
+                      } finally {
+                        setUploadingProof(false);
+                      }
+                    }}
+                  >
+                    {uploadingProof ? "Uploading..." : "Submit Request"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
+
           
           <Dialog open={stallDialogOpen} onOpenChange={setStallDialogOpen}>
             <DialogTrigger asChild>
