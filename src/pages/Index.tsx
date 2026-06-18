@@ -162,28 +162,6 @@ const Index = () => {
             </Card>
           )}
 
-          {/* Admin Dashboard (only for admins) */}
-          {isAdmin && (
-            <Card>
-              <CardContent className="p-4">
-                <Button
-                  onClick={() => navigate("/admin")}
-                  variant="ghost"
-                  className="w-full justify-start gap-4 h-16"
-                >
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                    <Users className="h-5 w-5 text-accent" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium">Staff Portal</div>
-                    <div className="text-sm text-muted-foreground">
-                      {language === "hi" ? "प्रशासनिक डैशबोर्ड" : "Administrative dashboard"}
-                    </div>
-                  </div>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
 
