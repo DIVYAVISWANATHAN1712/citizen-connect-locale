@@ -100,24 +100,26 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
 
   const handleStallSubmit = async () => {
     const finalCategory = stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice;
-    if (!selectedEventId || !stallForm.name || !finalCategory) return;
+    if (!stallForm.name || !finalCategory || !stallForm.start_date || !stallForm.end_date) return;
     const lines = [
       `Stall Name: ${stallForm.name}`,
       `Category: ${finalCategory}`,
+      `Start: ${stallForm.start_date}`,
+      `End: ${stallForm.end_date}`,
       stallForm.description ? `Description: ${stallForm.description}` : null,
       stallForm.address ? `Address: ${stallForm.address}` : null,
       stallForm.phone ? `Phone: ${stallForm.phone}` : null,
       stallForm.discount_percentage ? `Discount: ${stallForm.discount_percentage}%` : null,
       stallForm.discount_info ? `Offer: ${stallForm.discount_info}` : null,
     ].filter(Boolean).join("\n");
-    const success = await requestEventStall(selectedEventId, lines);
+    const success = await requestEventStall(lines);
     if (success) {
       setStallDialogOpen(false);
-      setSelectedEventId("");
       setStallCategoryChoice("");
-      setStallForm({ name: "", category: "", description: "", address: "", phone: "", discount_percentage: "", discount_info: "" });
+      setStallForm({ name: "", category: "", description: "", address: "", phone: "", discount_percentage: "", discount_info: "", start_date: "", end_date: "" });
     }
   };
+
 
   const handleEventSubmit = async () => {
     if (!newEvent.title || !newEvent.date || !newEvent.location) return;
