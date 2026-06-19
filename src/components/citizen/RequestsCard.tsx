@@ -45,7 +45,6 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
   const [stallDialogOpen, setStallDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [volCertDialogOpen, setVolCertDialogOpen] = useState(false);
-  const [selectedEventId, setSelectedEventId] = useState("");
   const [stallCategoryChoice, setStallCategoryChoice] = useState("");
   const [stallForm, setStallForm] = useState({
     name: "",
@@ -55,6 +54,8 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
     phone: "",
     discount_percentage: "",
     discount_info: "",
+    start_date: "",
+    end_date: "",
   });
   const [newEvent, setNewEvent] = useState({
     title: "",
