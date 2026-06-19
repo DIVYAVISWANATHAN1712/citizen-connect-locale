@@ -254,7 +254,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                 {language === "hi" ? "स्टाल अनुमति" : "Stall Permission"}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {language === "hi" ? "इवेंट स्टाल के लिए अनुरोध" : "Request Event Stall"}
@@ -262,30 +262,95 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>{language === "hi" ? "इवेंट चुनें" : "Select Event"}</Label>
-                  <Select value={selectedEventId} onValueChange={setSelectedEventId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={language === "hi" ? "इवेंट चुनें" : "Select event"} />
-                    </SelectTrigger>
-                    <SelectContent position="popper" className="z-[100] max-h-[240px]">
-                      {events.map(event => (
-                        <SelectItem key={event.id} value={event.id}>
-                          {language === "hi" ? event.title_hi : event.title_en}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>{language === "hi" ? "स्टाल विवरण" : "Stall Description"}</Label>
-                  <Textarea
-                    value={stallDescription}
-                    onChange={(e) => setStallDescription(e.target.value)}
-                    placeholder={language === "hi" ? "आपकी स्टाल किस बारे में होगी?" : "What will your stall be about?"}
-                    rows={3}
+                  <Label>Stall Name <span className="text-destructive">*</span></Label>
+                  <Input
+                    value={stallForm.name}
+                    onChange={(e) => setStallForm({ ...stallForm, name: e.target.value })}
+                    placeholder="Your stall name"
                   />
                 </div>
-                <Button onClick={handleStallSubmit} className="w-full" disabled={!selectedEventId || !stallDescription}>
+                <div className="space-y-2">
+                  <Label>Category <span className="text-destructive">*</span></Label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={stallCategoryChoice}
+                    onChange={(e) => {
+                      setStallCategoryChoice(e.target.value);
+                      if (e.target.value !== "Other") setStallForm({ ...stallForm, category: e.target.value });
+                      else setStallForm({ ...stallForm, category: "" });
+                    }}
+                  >
+                    <option value="">Select category</option>
+                    {PRESET_STALL_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                    <option value="Other">Other</option>
+                  </select>
+                  {stallCategoryChoice === "Other" && (
+                    <Input
+                      placeholder="Enter custom category"
+                      value={stallForm.category}
+                      onChange={(e) => setStallForm({ ...stallForm, category: e.target.value })}
+                    />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>{language === "hi" ? "इवेंट चुनें" : "Select Event"} <span className="text-destructive">*</span></Label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={selectedEventId}
+                    onChange={(e) => setSelectedEventId(e.target.value)}
+                  >
+                    <option value="">{language === "hi" ? "इवेंट चुनें" : "Select event"}</option>
+                    {events.map(event => (
+                      <option key={event.id} value={event.id}>
+                        {language === "hi" ? event.title_hi : event.title_en}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>{language === "hi" ? "विवरण" : "Description"}</Label>
+                  <Textarea
+                    value={stallForm.description}
+                    onChange={(e) => setStallForm({ ...stallForm, description: e.target.value })}
+                    placeholder={language === "hi" ? "आपकी स्टाल किस बारे में होगी?" : "What will your stall be about?"}
+                    rows={2}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Address</Label>
+                    <Input value={stallForm.address} onChange={(e) => setStallForm({ ...stallForm, address: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input value={stallForm.phone} onChange={(e) => setStallForm({ ...stallForm, phone: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Discount %</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={stallForm.discount_percentage}
+                      onChange={(e) => setStallForm({ ...stallForm, discount_percentage: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Offer Info</Label>
+                    <Input
+                      value={stallForm.discount_info}
+                      onChange={(e) => setStallForm({ ...stallForm, discount_info: e.target.value })}
+                      placeholder="e.g., Buy 2 Get 1"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={handleStallSubmit}
+                  className="w-full"
+                  disabled={!selectedEventId || !stallForm.name || !(stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice)}
+                >
                   {language === "hi" ? "अनुरोध भेजें" : "Submit Request"}
                 </Button>
               </div>
