@@ -45,7 +45,6 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
   const [stallDialogOpen, setStallDialogOpen] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [volCertDialogOpen, setVolCertDialogOpen] = useState(false);
-  const [selectedEventId, setSelectedEventId] = useState("");
   const [stallCategoryChoice, setStallCategoryChoice] = useState("");
   const [stallForm, setStallForm] = useState({
     name: "",
@@ -55,6 +54,8 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
     phone: "",
     discount_percentage: "",
     discount_info: "",
+    start_date: "",
+    end_date: "",
   });
   const [newEvent, setNewEvent] = useState({
     title: "",
@@ -99,24 +100,26 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
 
   const handleStallSubmit = async () => {
     const finalCategory = stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice;
-    if (!selectedEventId || !stallForm.name || !finalCategory) return;
+    if (!stallForm.name || !finalCategory || !stallForm.start_date || !stallForm.end_date) return;
     const lines = [
       `Stall Name: ${stallForm.name}`,
       `Category: ${finalCategory}`,
+      `Start: ${stallForm.start_date}`,
+      `End: ${stallForm.end_date}`,
       stallForm.description ? `Description: ${stallForm.description}` : null,
       stallForm.address ? `Address: ${stallForm.address}` : null,
       stallForm.phone ? `Phone: ${stallForm.phone}` : null,
       stallForm.discount_percentage ? `Discount: ${stallForm.discount_percentage}%` : null,
       stallForm.discount_info ? `Offer: ${stallForm.discount_info}` : null,
     ].filter(Boolean).join("\n");
-    const success = await requestEventStall(selectedEventId, lines);
+    const success = await requestEventStall(lines);
     if (success) {
       setStallDialogOpen(false);
-      setSelectedEventId("");
       setStallCategoryChoice("");
-      setStallForm({ name: "", category: "", description: "", address: "", phone: "", discount_percentage: "", discount_info: "" });
+      setStallForm({ name: "", category: "", description: "", address: "", phone: "", discount_percentage: "", discount_info: "", start_date: "", end_date: "" });
     }
   };
+
 
   const handleEventSubmit = async () => {
     if (!newEvent.title || !newEvent.date || !newEvent.location) return;
@@ -292,20 +295,23 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                     />
                   )}
                 </div>
-                <div className="space-y-2">
-                  <Label>{language === "hi" ? "इवेंट चुनें" : "Select Event"} <span className="text-destructive">*</span></Label>
-                  <select
-                    className="w-full p-2 border rounded-md bg-background"
-                    value={selectedEventId}
-                    onChange={(e) => setSelectedEventId(e.target.value)}
-                  >
-                    <option value="">{language === "hi" ? "इवेंट चुनें" : "Select event"}</option>
-                    {events.map(event => (
-                      <option key={event.id} value={event.id}>
-                        {language === "hi" ? event.title_hi : event.title_en}
-                      </option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Start Date <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="date"
+                      value={stallForm.start_date}
+                      onChange={(e) => setStallForm({ ...stallForm, start_date: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>End Date <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="date"
+                      value={stallForm.end_date}
+                      onChange={(e) => setStallForm({ ...stallForm, end_date: e.target.value })}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>{language === "hi" ? "विवरण" : "Description"}</Label>
@@ -349,7 +355,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                 <Button
                   onClick={handleStallSubmit}
                   className="w-full"
-                  disabled={!selectedEventId || !stallForm.name || !(stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice)}
+                  disabled={!stallForm.name || !stallForm.start_date || !stallForm.end_date || !(stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice)}
                 >
                   {language === "hi" ? "अनुरोध भेजें" : "Submit Request"}
                 </Button>

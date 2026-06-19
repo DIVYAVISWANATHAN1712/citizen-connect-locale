@@ -125,7 +125,7 @@ export function useApprovalRequests() {
     return true;
   };
 
-  const requestEventStall = async (eventId: string, stallDescription: string) => {
+  const requestEventStall = async (stallDescription: string, eventId?: string | null) => {
     if (!user) {
       toast({ title: 'Please login', variant: 'destructive' });
       return false;
@@ -134,7 +134,7 @@ export function useApprovalRequests() {
     const { error } = await supabase.from('approval_requests').insert({
       user_id: user.id,
       request_type: 'event_stall' as ApprovalRequestType,
-      event_id: eventId,
+      event_id: eventId ?? null,
       stall_description: stallDescription,
     });
 
