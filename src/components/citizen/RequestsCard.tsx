@@ -295,20 +295,23 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                     />
                   )}
                 </div>
-                <div className="space-y-2">
-                  <Label>{language === "hi" ? "इवेंट चुनें" : "Select Event"} <span className="text-destructive">*</span></Label>
-                  <select
-                    className="w-full p-2 border rounded-md bg-background"
-                    value={selectedEventId}
-                    onChange={(e) => setSelectedEventId(e.target.value)}
-                  >
-                    <option value="">{language === "hi" ? "इवेंट चुनें" : "Select event"}</option>
-                    {events.map(event => (
-                      <option key={event.id} value={event.id}>
-                        {language === "hi" ? event.title_hi : event.title_en}
-                      </option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Start Date <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="date"
+                      value={stallForm.start_date}
+                      onChange={(e) => setStallForm({ ...stallForm, start_date: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>End Date <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="date"
+                      value={stallForm.end_date}
+                      onChange={(e) => setStallForm({ ...stallForm, end_date: e.target.value })}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>{language === "hi" ? "विवरण" : "Description"}</Label>
