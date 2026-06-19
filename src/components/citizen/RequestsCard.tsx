@@ -46,7 +46,16 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [volCertDialogOpen, setVolCertDialogOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
-  const [stallDescription, setStallDescription] = useState("");
+  const [stallCategoryChoice, setStallCategoryChoice] = useState("");
+  const [stallForm, setStallForm] = useState({
+    name: "",
+    category: "",
+    description: "",
+    address: "",
+    phone: "",
+    discount_percentage: "",
+    discount_info: "",
+  });
   const [newEvent, setNewEvent] = useState({
     title: "",
     description: "",
@@ -56,6 +65,8 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
   const [volCert, setVolCert] = useState({ full_name: "", event_name: "" });
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [uploadingProof, setUploadingProof] = useState(false);
+
+  const PRESET_STALL_CATEGORIES = ["Grocery", "Restaurant", "Pharmacy", "Electronics", "Clothing", "Services"];
 
 
   const getStatusBadge = (status: string) => {
