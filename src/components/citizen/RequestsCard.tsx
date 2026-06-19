@@ -98,12 +98,23 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
   };
 
   const handleStallSubmit = async () => {
-    if (!selectedEventId || !stallDescription) return;
-    const success = await requestEventStall(selectedEventId, stallDescription);
+    const finalCategory = stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice;
+    if (!selectedEventId || !stallForm.name || !finalCategory) return;
+    const lines = [
+      `Stall Name: ${stallForm.name}`,
+      `Category: ${finalCategory}`,
+      stallForm.description ? `Description: ${stallForm.description}` : null,
+      stallForm.address ? `Address: ${stallForm.address}` : null,
+      stallForm.phone ? `Phone: ${stallForm.phone}` : null,
+      stallForm.discount_percentage ? `Discount: ${stallForm.discount_percentage}%` : null,
+      stallForm.discount_info ? `Offer: ${stallForm.discount_info}` : null,
+    ].filter(Boolean).join("\n");
+    const success = await requestEventStall(selectedEventId, lines);
     if (success) {
       setStallDialogOpen(false);
       setSelectedEventId("");
-      setStallDescription("");
+      setStallCategoryChoice("");
+      setStallForm({ name: "", category: "", description: "", address: "", phone: "", discount_percentage: "", discount_info: "" });
     }
   };
 
