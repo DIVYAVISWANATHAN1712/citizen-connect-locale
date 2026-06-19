@@ -355,7 +355,7 @@ export function RequestsCard({ language, donations, events, isVolunteer }: Reque
                 <Button
                   onClick={handleStallSubmit}
                   className="w-full"
-                  disabled={!selectedEventId || !stallForm.name || !(stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice)}
+                  disabled={!stallForm.name || !stallForm.start_date || !stallForm.end_date || !(stallCategoryChoice === "Other" ? stallForm.category : stallCategoryChoice)}
                 >
                   {language === "hi" ? "अनुरोध भेजें" : "Submit Request"}
                 </Button>
